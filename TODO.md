@@ -9,6 +9,12 @@
 
 ---
 
+## ✅ Built (needs testing)
+
+- [ ] **Dater proposes sub-range + slot splitting** — backend done. Dater requests 1-4 PM within host's 12-8 PM. On approve, remaining 12-1 PM and 4-8 PM become open slots.
+
+---
+
 ## 🔜 Soon
 
 - [ ] Stripe Connect webhook for refunds
