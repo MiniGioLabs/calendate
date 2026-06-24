@@ -1,4 +1,4 @@
-"""CalDate — FastAPI app entry point. Cal.com-inspired scheduling."""
+"""CalenDate — FastAPI app entry point. Cal.com-inspired scheduling."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="CalDate", lifespan=lifespan)
+app = FastAPI(title="CalenDate", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY, session_cookie="caldate")
 
 static_dir = Path(settings.STATIC_DIR) if settings.STATIC_DIR else Path(__file__).parent / "static"

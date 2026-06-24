@@ -15,7 +15,7 @@ _db_path: str | None = None
 def _get_db_path() -> str:
     global _db_path
     if _db_path is None:
-        _db_path = settings.DATABASE_PATH or str(Path(__file__).parent.parent.parent / "caldate.db")
+        _db_path = settings.DATABASE_PATH or str(Path(__file__).parent.parent.parent / "calendate.db")
     return _db_path
 
 

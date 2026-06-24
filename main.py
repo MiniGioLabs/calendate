@@ -1,1 +1,1 @@
-from caldate.main import app
+from calendate.main import app
