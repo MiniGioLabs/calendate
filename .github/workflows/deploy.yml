@@ -10,6 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set repo variables
+        id: vars
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner=$OWNER" >> $GITHUB_OUTPUT
+          echo "tag=ghcr.io/$OWNER/calendate:latest" >> $GITHUB_OUTPUT
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -22,7 +29,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/calendate:latest
+          tags: ${{ steps.vars.outputs.tag }}
 
       - name: Deploy to Lightsail
         uses: appleboy/ssh-action@v1
@@ -32,6 +39,6 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd ~/calendate
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans

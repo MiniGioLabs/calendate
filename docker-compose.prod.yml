@@ -4,16 +4,16 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - SECRET_KEY=${SECRET_KEY:-chang...ion}
-      - BASE_URL=${BASE_URL:-https://calendate.link}
       - DATABASE_PATH=/data/calendate.db
     volumes:
       - calendate_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
 
 volumes:
