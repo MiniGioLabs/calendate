@@ -22,6 +22,9 @@ wheels/
 calendate.db
 calendate.db-shm
 calendate.db-wal
+caldate.db
+caldate.db-shm
+caldate.db-wal
 
 # User-uploaded media
 src/calendate/static/avatars/
