@@ -10,9 +10,11 @@ RUN tar -xzf /tmp/uv.tar.gz -C /usr/local/bin --strip-components=1 && rm /tmp/uv
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
-# Copy source
+# Copy source and re-sync to install local package
 COPY src/ ./src/
+RUN uv sync --frozen --no-dev
 ENV PYTHONPATH=/app/src
+ENV UV_CACHE_DIR=/tmp/uv-cache
 
 RUN useradd -r -s /bin/false appuser && chown -R appuser /app
 USER appuser

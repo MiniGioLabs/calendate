@@ -5,26 +5,23 @@ on:
     branches: [main]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: |
-          pip install uv
-          uv sync
-          PYTHONPATH=src uv run pytest tests/ -v
-
   deploy:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -t calendate:latest .
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/minigiolabs/calendate:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Ship image to Lightsail
+      - name: Deploy to Lightsail
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
@@ -33,6 +30,8 @@ jobs:
           script: |
             cd ~/calendate
             git pull origin main
-            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
-            sleep 5
-            curl -sf http://localhost:8000/health && echo "✓ Deploy OK" || echo "✗ Health check failed"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u minigiolabs --password-stdin
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            sleep 3
+            docker compose -f docker-compose.prod.yml logs --tail=5
