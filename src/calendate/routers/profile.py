@@ -69,11 +69,12 @@ async def update_deposit(request: Request, deposit_dollars: str = Form(...)):
         return RedirectResponse("/login", status_code=302)
 
     try:
-        cents = round(float(deposit_dollars) * 100)
-        if cents < 0:
+        amount = float(deposit_dollars)
+        if amount != int(amount) or int(amount) < 0 or int(amount) % 5 != 0:
             raise ValueError
+        cents = int(amount) * 100
     except ValueError:
-        return render(request, "settings.html", user=user, deposit_error="Enter a valid deposit amount.")
+        return render(request, "settings.html", user=user, deposit_error="Deposit must be in $5 increments — $5, $10, $15...")
 
     db = await get_db()
     try:
