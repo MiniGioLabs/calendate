@@ -26,7 +26,7 @@
     {% endif %}
 
     {% if declined %}
-    <h2 class="text-sm font-semibold text-red-600 mb-2 uppercase tracking-wide">❌ Declined ({{ declined|length }})</h2>
+    <h2 class="text-sm font-semibold text-red-600 mb-2 uppercase tracking-wide">❌ Passed ({{ declined|length }})</h2>
     <div class="space-y-2 mb-4">
         {% for req in declined %}
             {% with status='declined' %}{% include "partials/request_card.html" %}{% endwith %}

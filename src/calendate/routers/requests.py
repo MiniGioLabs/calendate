@@ -112,7 +112,7 @@ async def deny_request(request: Request, request_id: int, decline_reason: str = 
         except Exception as e:
             logger.error("Refund failed for request %d: %s", request_id, e)
             return HTMLResponse(
-                '<p class="text-sm text-red-500 text-center py-2">⚠️ Refund failed — issue it manually in your Stripe dashboard, then deny again.</p>',
+                '<p class="text-sm text-red-500 text-center py-2">⚠️ Couldn\'t return the tip automatically — go to your Stripe dashboard to process it manually, then pass again.</p>',
                 status_code=200,
             )
 
@@ -126,9 +126,9 @@ async def deny_request(request: Request, request_id: int, decline_reason: str = 
         await db.close()
 
     if req_dict.get("date_phone"):
-        msg = "Sorry, your date request was declined."
+        msg = "Your date request wasn't accepted this time."
         if decline_reason:
-            msg += f' Reason: "{decline_reason}"'
+            msg += f' She left a note: "{decline_reason}"'
         await send_sms(req_dict["date_phone"], msg)
 
     if request.headers.get("HX-Request"):
@@ -157,7 +157,7 @@ async def cancel_request(request: Request, request_id: int):
         except Exception as e:
             logger.error("Refund failed for request %d: %s", request_id, e)
             return HTMLResponse(
-                '<p class="text-sm text-red-500 text-center py-2">⚠️ Refund failed — issue it manually in your Stripe dashboard, then cancel again.</p>',
+                '<p class="text-sm text-red-500 text-center py-2">⚠️ Couldn\'t return the tip automatically — go to your Stripe dashboard to process it manually, then cancel again.</p>',
                 status_code=200,
             )
 

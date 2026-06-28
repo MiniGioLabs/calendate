@@ -62,28 +62,6 @@ async def update_avatar(request: Request, avatar: UploadFile = File(...)):
     return RedirectResponse("/settings", status_code=302)
 
 
-@router.post("/settings/deposit", response_class=HTMLResponse)
-async def update_deposit(request: Request, deposit_dollars: str = Form(...)):
-    user = await get_current_user(request)
-    if not user:
-        return RedirectResponse("/login", status_code=302)
-
-    try:
-        amount = float(deposit_dollars)
-        if amount != int(amount) or int(amount) < 0 or int(amount) % 5 != 0:
-            raise ValueError
-        cents = int(amount) * 100
-    except ValueError:
-        return render(request, "settings.html", user=user, deposit_error="Deposit must be in $5 increments — $5, $10, $15...")
-
-    db = await get_db()
-    try:
-        await db.execute("UPDATE users SET deposit_cents=? WHERE id=?", (cents, user["id"]))
-        await db.commit()
-    finally:
-        await db.close()
-
-    return RedirectResponse("/settings", status_code=302)
 
 
 @router.post("/settings/stripe/connect", response_class=HTMLResponse)

@@ -115,9 +115,10 @@ async def booking_day(request: Request, token: str):
     finally:
         await db.close()
 
+    has_stripe = bool(user.get("stripe_onboarding_complete")) and bool(settings.STRIPE_SECRET_KEY)
     return render(request, "partials/_booking_day.html",
                   slots=free_slots, date_str=date_str, token=token,
-                  deposit_cents=user.get("deposit_cents", 0))
+                  has_stripe=has_stripe)
 
 
 @router.post("/book/{token}/reserve")
@@ -126,7 +127,8 @@ async def reserve_slot(request: Request, token: str,
                        date_name: str = Form(...), date_phone: str = Form(...),
                        slot_id: int = Form(...),
                        proposed_start: str = Form(""), proposed_end: str = Form(""),
-                       location: str = Form(""), label: str = Form("")):
+                       location: str = Form(""), label: str = Form(""),
+                       tip_dollars: int = Form(0)):
     date_phone = normalize_phone(date_phone)
     date_name = date_name.strip()
 
@@ -158,26 +160,25 @@ async def reserve_slot(request: Request, token: str,
             if await overlap.fetchone():
                 return HTMLResponse('<p class="text-sm text-red-500">That time is already booked.</p>')
 
-        host = await (await db.execute("SELECT deposit_cents FROM users WHERE id=?", (slot["user_id"],))).fetchone()
-        deposit_cents = (host["deposit_cents"] if host else 0) or 0
+        tip_cents = tip_dollars * 100 if tip_dollars > 0 and tip_dollars % 5 == 0 else 0
 
         cur = await db.execute(
             "INSERT INTO date_requests (slot_id, date_name, date_phone, status, proposed_start, proposed_end, location, label, deposit_cents) VALUES (?,?,?,?,?,?,?,?,?)",
-            (slot_id, date_name, date_phone, "pending", prop_start, prop_end, location, label, deposit_cents))
+            (slot_id, date_name, date_phone, "pending", prop_start, prop_end, location, label, tip_cents))
         request_id = cur.lastrowid
         await db.commit()
     finally:
         await db.close()
 
-    if deposit_cents > 0 and settings.STRIPE_SECRET_KEY:
+    if tip_cents > 0 and settings.STRIPE_SECRET_KEY:
         try:
             session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
                 line_items=[{
                     "price_data": {
                         "currency": "usd",
-                        "product_data": {"name": "CalenDate earnest deposit"},
-                        "unit_amount": deposit_cents,
+                        "product_data": {"name": "CalenDate date request tip"},
+                        "unit_amount": tip_cents,
                     },
                     "quantity": 1,
                 }],
@@ -186,8 +187,8 @@ async def reserve_slot(request: Request, token: str,
                 cancel_url=f"{settings.BASE_URL}/book/cancel",
                 client_reference_id=str(request_id),
             )
-            return HTMLResponse(f'<meta http-equiv="refresh" content="0;url={session.url}"><div class="text-center py-8"><div class="text-5xl mb-4">💳</div><h2 class="text-xl font-bold mb-2">Redirecting to Stripe...</h2><p class="text-gray-500">Complete your deposit to send the request.</p></div>')
+            return HTMLResponse(f'<meta http-equiv="refresh" content="0;url={session.url}"><div class="text-center py-8"><div class="text-5xl mb-4">💌</div><h2 class="text-xl font-bold mb-2">One more step...</h2><p class="text-gray-500">Complete your tip to send the date request and stand out from the crowd.</p></div>')
         except Exception:
             pass
 
-    return HTMLResponse("""<div class='text-center py-8'><div class='text-5xl mb-4'>🎉</div><h2 class='text-xl font-bold mb-2'>Request sent!</h2><p class='text-gray-500'>You'll get a text when it's confirmed.</p></div>""")
+    return HTMLResponse("""<div class='text-center py-8'><div class='text-5xl mb-4'>💌</div><h2 class='text-xl font-bold mb-2'>Request sent!</h2><p class='text-gray-500'>She'll see it and you'll get a text if she accepts.</p></div>""")

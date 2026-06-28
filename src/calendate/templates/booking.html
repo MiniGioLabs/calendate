@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ host.name }} — CalenDate{% endblock %}
-{% block og_title %}Book a date with {{ host.name }} — CalenDate{% endblock %}
-{% block og_description %}Pick from {{ host.name }}'s available dates and send a booking request.{% endblock %}
+{% block og_title %}Send {{ host.name }} a date request — CalenDate{% endblock %}
+{% block og_description %}Browse {{ host.name }}'s open times and send a date request. Show her you're serious.{% endblock %}
 {% block og_image %}{% if host.avatar_url %}{{ request.base_url }}{{ host.avatar_url.lstrip('/') }}{% else %}{{ request.base_url }}static/og-image.png{% endif %}{% endblock %}
-{% block meta_description %}Pick from {{ host.name }}'s available dates and send a booking request.{% endblock %}
+{% block meta_description %}Browse {{ host.name }}'s open times and send a date request. Show her you're serious.{% endblock %}
 {% block content %}
 <div class="max-w-lg mx-auto">
     <!-- Host profile -->
@@ -16,7 +16,7 @@
             {% endif %}
         </div>
         <h1 class="text-xl font-bold">{{ host.name }}</h1>
-        <p class="text-gray-500 text-sm">Pick a date to book</p>
+        <p class="text-gray-500 text-sm">Pick a time to send a request</p>
     </div>
 
     <!-- Calendar -->
@@ -50,6 +50,16 @@ function selectDay(btn) {
     });
     btn.setAttribute('data-selected', '1');
     btn.classList.add('bg-brand', 'text-white');
+}
+function selectTip(slotId, amount, btn) {
+    var container = document.getElementById('tip-pills-' + slotId);
+    container.querySelectorAll('.tip-pill').forEach(function(p) {
+        p.classList.remove('selected', 'border-2', 'border-brand', 'bg-brand/10', 'text-brand');
+        p.classList.add('border', 'border-gray-200', 'text-gray-600');
+    });
+    btn.classList.remove('border', 'border-gray-200', 'text-gray-600');
+    btn.classList.add('selected', 'border-2', 'border-brand', 'bg-brand/10', 'text-brand');
+    document.getElementById('tip-dollars-' + slotId).value = amount;
 }
 function clampSubRange(slotId) {
     var s=document.getElementById('start-'+slotId);

@@ -49,10 +49,28 @@
                     <input type="tel" name="date_phone" required pattern="[\d\s\(\)\-\.\+]{10,}" placeholder="Your US phone (10 digits)" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
                     <p class="text-xs text-gray-400 mt-1">US numbers only — you'll get a text when confirmed</p>
                 </div>
-                {% if deposit_cents > 0 %}
-                <p class="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">💰 ${{ "%.2f"|format(deposit_cents/100) }} deposit required.</p>
+                {% if has_stripe %}
+                <div class="space-y-2 pt-1">
+                    <p class="text-sm font-medium text-gray-700">Add a tip? <span class="text-gray-400 font-normal text-xs">(totally optional)</span></p>
+                    <p class="text-xs text-gray-400">Stand out from her inbox — 100% goes to her. 💌</p>
+                    <div class="flex flex-wrap gap-2" id="tip-pills-{{ slot.id }}">
+                        <button type="button" onclick="selectTip({{ slot.id }}, 0, this)"
+                                class="tip-pill selected px-3 py-1.5 rounded-full text-xs font-medium border-2 border-brand bg-brand/10 text-brand">Skip</button>
+                        <button type="button" onclick="selectTip({{ slot.id }}, 5, this)"
+                                class="tip-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-600 hover:border-brand transition-colors">$5</button>
+                        <button type="button" onclick="selectTip({{ slot.id }}, 10, this)"
+                                class="tip-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-600 hover:border-brand transition-colors">$10</button>
+                        <button type="button" onclick="selectTip({{ slot.id }}, 15, this)"
+                                class="tip-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-600 hover:border-brand transition-colors">$15</button>
+                        <button type="button" onclick="selectTip({{ slot.id }}, 20, this)"
+                                class="tip-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-600 hover:border-brand transition-colors">$20</button>
+                        <button type="button" onclick="selectTip({{ slot.id }}, 25, this)"
+                                class="tip-pill px-3 py-1.5 rounded-full text-xs font-medium border border-gray-200 text-gray-600 hover:border-brand transition-colors">$25</button>
+                    </div>
+                    <input type="hidden" name="tip_dollars" id="tip-dollars-{{ slot.id }}" value="0">
+                </div>
                 {% endif %}
-                <button type="submit" id="submit-{{ slot.id }}" class="w-full bg-brand text-white py-2.5 rounded-xl text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed">Request Date</button>
+                <button type="submit" id="submit-{{ slot.id }}" class="w-full bg-brand text-white py-2.5 rounded-xl text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed">Send Date Request</button>
             </form>
         </div>
     </div>

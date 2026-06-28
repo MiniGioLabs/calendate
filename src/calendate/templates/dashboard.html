@@ -366,10 +366,10 @@ function _doCancel(reqId) {
         });
 }
 function confirmCancelWithDeposit(reqId, amount) {
-    document.getElementById('cancel-confirm-icon').textContent = '💸';
-    document.getElementById('cancel-confirm-title').textContent = 'Hold up — there\'s money on the table';
-    document.getElementById('cancel-confirm-body').innerHTML = 'This date has a <span class="font-semibold text-gray-700">$' + amount + '</span> earnest deposit riding on it. Cancelling sends that straight back to your date. No hard feelings, just makin\' sure. 🫡';
-    document.getElementById('cancel-confirm-btn').textContent = 'Cancel & refund';
+    document.getElementById('cancel-confirm-icon').textContent = '💌';
+    document.getElementById('cancel-confirm-title').textContent = 'Just checking — this one came with a tip';
+    document.getElementById('cancel-confirm-body').innerHTML = 'He sent a <span class="font-semibold text-gray-700">$' + amount + '</span> tip with this request. Cancelling will return it to him.';
+    document.getElementById('cancel-confirm-btn').textContent = 'Yes, cancel it';
     document.getElementById('request-modal').classList.add('hidden');
     document.getElementById('cancel-confirm-btn').onclick = function() {
         document.getElementById('cancel-confirm-modal').classList.add('hidden');
@@ -380,7 +380,7 @@ function confirmCancelWithDeposit(reqId, amount) {
 function confirmCancel(reqId) {
     document.getElementById('cancel-confirm-icon').textContent = '🤔';
     document.getElementById('cancel-confirm-title').textContent = 'Cancel this date?';
-    document.getElementById('cancel-confirm-body').textContent = 'This can\'t be undone. Your date will be notified.';
+    document.getElementById('cancel-confirm-body').textContent = 'This can\'t be undone. He\'ll be notified.';
     document.getElementById('cancel-confirm-btn').textContent = 'Yes, cancel';
     document.getElementById('request-modal').classList.add('hidden');
     document.getElementById('cancel-confirm-btn').onclick = function() {
